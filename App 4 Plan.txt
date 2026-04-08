@@ -1,0 +1,26 @@
+Phase 1  →   Delegates - Done Delegate.cs created 
+             custom delegate
+             Action<T>
+             Func<T>
+             Predicate<T>
+             multicast delegates
+
+Phase 2  →   Events
+             EventHandler - In Program.cs 
+             custom EventArgs
+             publisher class :- the source of the event
+             subscriber class :- the one who listens to the event
+             real world pattern
+
+Phase 3  →   Async/Await deep dive
+             Task vs Task<T>
+             async void vs async Task
+             CancellationToken
+             ConfigureAwait
+             parallel tasks
+             WhenAll, WhenAny
+
+Phase 4  →   All three together
+             async event handlers
+             delegate with async
+             real world scenario
