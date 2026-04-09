@@ -12,6 +12,7 @@ All code typed manually to build real understanding.
 This is a **dedicated reference app** for three core C# concepts that every
 professional developer uses daily. Built after completing the EF Core apps,
 this app focuses purely on C# language features — no database noise.
+Every concept understood before moving to the next.
 
 ---
 
@@ -20,18 +21,18 @@ this app focuses purely on C# language features — no database noise.
 ```
 Phase 1  →  Delegates first
              foundation of everything
-             Events use delegates
+             Events use delegates internally
              Async uses delegates internally
 
 Phase 2  →  Events second
              built on delegates
              publisher/subscriber pattern
-             real world scenario
+             real world order scenario
 
-Phase 3  →  Async/Await third (coming)
-             uses Task<T> not Task
+Phase 3  →  Async/Await third
+             Task<T> preferred over Task
              meaningful return values
-             deep dive
+             deep dive into async concepts
 ```
 
 ---
@@ -50,23 +51,30 @@ Phase 3  →  Async/Await third (coming)
 - Named methods vs lambda
 
 ### Phase 2 — Events
-- Custom `EventArgs` class
+- Custom `EventArgs` class (`OrderEventArgs`)
 - Publisher class (`OrderProcessor`)
-- Subscriber classes (`NotificationService`, `LoggerService`)
+- Two subscriber classes (`NotificationService`, `LoggerService`)
 - `EventHandler<T>` declaration
 - Null safe event firing `?.Invoke()`
 - Multiple subscribers — both notified
 - Real world scenario — Order processing
+- Timestamp in EventArgs (`ProcessedAt`)
 
-### Phase 3 — Async/Await (coming)
-- `Task` vs `Task<T>` — why `Task<T>` preferred
-- `async void` vs `async Task` — why void avoided
-- `Task.WhenAll` — run multiple tasks together
-- `Task.WhenAny` — first one wins
-- `CancellationToken` — cancel long operations
-- Exception handling in async
-- Async event handlers with `Task<T>`
-- Custom delegate returning `Task<T>`
+### Phase 3 — Async/Await
+- `static async Task Main()` entry point
+- `Task<T>` — preferred, returns meaningful value
+- `Task` alone — no return value
+- Why `async void` avoided
+- `await Task.Delay()` — simulate waiting
+- Method overloading with async
+- `Task.WhenAll` — all tasks run together
+- `Task.WhenAny` — fastest task wins
+- `CancellationToken` — cancel operations
+- `CancellationTokenSource.CancelAfter()` — time based
+- Condition based cancellation
+- `OperationCanceledException` handling
+- `using var cts` — proper disposal
+- `IsCancellationRequested` — check state
 
 ---
 
@@ -78,6 +86,7 @@ Delegate     =  method pointer
                 pass method as parameter
                 store method as variable
                 chain multiple methods
+                foundation of Events
 ```
 
 ### Events
@@ -86,6 +95,7 @@ Event        =  delegate with rules
                 only publisher fires
                 subscribers just listen
                 publisher/subscriber pattern
+                real world: Order → Notify + Log
 ```
 
 ### Async/Await
@@ -96,7 +106,7 @@ Async/Await  =  waiting mechanism
                 server scalable
                 its own relevance
                 NOT part of generics
-                advanced feature ✅
+                advanced C# feature ✅
 ```
 
 ---
@@ -112,6 +122,20 @@ Async/Await  =  waiting mechanism
 
 ---
 
+## Task<T> — no limitation on T
+
+```csharp
+Task<string>         ✅  →  returns string
+Task<int>            ✅  →  returns int
+Task<bool>           ✅  →  returns bool
+Task<Person>         ✅  →  returns object
+Task<List<T>>        ✅  →  returns collection
+Task<IActionResult>  ✅  →  MVC
+Task<void>           ❌  →  not allowed — use Task
+```
+
+---
+
 ## Async vs Sync
 
 | Sync | Async |
@@ -124,17 +148,57 @@ Async/Await  =  waiting mechanism
 
 ---
 
-## Why Task\<T\> over Task
+## CancellationToken — two approaches
+
+```csharp
+// Time based
+cts.CancelAfter(4000);  // cancel after 4 seconds
+
+// Condition based
+if (retryCount > 3)
+    cts.Cancel();       // cancel on condition ✅
+```
+
+---
+
+## Task.WhenAll vs Task.WhenAny
 
 ```
-Task       →  fire and forget
-              no return value
-              void equivalent
+WhenAll  →  waits for ALL tasks
+             all run together
+             returns all results
+             real world: send 3 emails,
+             wait for all sent ✅
 
-Task<T>    →  meaningful result
-              return value
-              caller gets data
-              more useful ✅
+WhenAny  →  waits for FIRST task
+             fastest one wins
+             others keep running
+             real world: call 3 servers,
+             use fastest response ✅
+```
+
+---
+
+## Important distinctions
+
+```
+Generics       →  95% of C# structure
+                  type safety, reusability
+                  compile time concept
+
+Async/Await    →  its own relevance
+                  runtime behaviour
+                  performance, scalability
+                  advanced feature
+                  cannot compare to generics
+                  different concerns entirely ✅
+
+API Token      →  authentication/security
+                  string key, proves identity
+
+CancellationToken→  async control
+                    stops operation
+                    same word — different context ✅
 ```
 
 ---
@@ -146,19 +210,8 @@ CSharp.Async.Delegates.Events/
 │
 ├── DelegateExamples.cs  →  all delegate demos
 ├── EventDemo.cs         →  publisher/subscriber
-├── AsyncDemo.cs         →  coming soon
+├── AsyncDemo.cs         →  async demos
 └── Program.cs           →  entry point
-```
-
----
-
-## How to run
-
-1. Clone the repo
-2. Open in Visual Studio or VS Code
-3. Run:
-```bash
-dotnet run
 ```
 
 ---
@@ -180,10 +233,29 @@ Before execution
 Lambda executing!
 After execution
 === Demo Complete ===
-
 Processing order ORD123 for quantity 5...
-[Notification] Order ORD123 processed at 08-04-2026
-[Logger] Order ORD123 processed at 08-04-2026
+[Notification] Order ORD123 processed at 09-04-2026
+[Logger] Order ORD123 processed at 09-04-2026
+Hello from Async Method!
+=== Task.WhenAll ===
+Hello, Task 1! Welcome to Async Programming!
+Hello, Task 2! Welcome to Async Programming!
+Hello, Task 3! Welcome to Async Programming!
+=== Task.WhenAny ===
+First completed: Hello, Fast Task! This message took 500ms
+=== CancellationToken ===
+Async operation was cancelled!
+```
+
+---
+
+## How to run
+
+1. Clone the repo
+2. Open in Visual Studio or VS Code
+3. Run:
+```bash
+dotnet run
 ```
 
 ---
@@ -192,42 +264,31 @@ Processing order ORD123 for quantity 5...
 
 - How delegates work as method pointers
 - Difference between Action, Func, Predicate
-- How multicast delegates chain methods
+- How multicast delegates chain and remove methods
 - How events are delegates with rules
-- Publisher/subscriber pattern
-- Why `?.Invoke()` is null safe
-- Why async/await is separate from generics
-- Why `Task<T>` is preferred over `Task`
+- Publisher/subscriber pattern — real world order processing
+- Why `?.Invoke()` is null safe event firing
+- Why `Task<T>` preferred over `Task`
+- Why `async void` is avoided
+- How `Task.WhenAll` runs tasks together
+- How `Task.WhenAny` returns fastest result
+- How `CancellationToken` controls async operations
+- Time based vs condition based cancellation
 - Why async/await replaced Mutex in modern C#
-- Logic behind every concept before coding
-
----
-
-## Important distinctions
-
-```
-Generics     →  95% of C# structure
-               type safety, reusability
-               compile time concept
-
-Async/Await  →  its own relevance
-               runtime behaviour
-               performance, scalability
-               advanced feature
-               cannot compare to generics
-               different concerns entirely ✅
-```
+- Why legacy apps used Thread + flags instead
+- Difference between API Token and CancellationToken
+- Logic behind every concept before implementation
 
 ---
 
 ## Next steps planned
 
 ```
-⬜  Phase 3 — Deep Async/Await
-⬜  Task<T> in event handlers
+⬜  Async + Events + CancellationToken combined
 ⬜  Custom delegate returning Task<T>
-⬜  CancellationToken demo
-⬜  Task.WhenAll demo
+⬜  SOLID principles
+⬜  Dependency Injection
+⬜  MVC (same entities, same EF Core)
 ```
 
 ---
@@ -248,5 +309,6 @@ Async/Await  →  its own relevance
 > All code typed manually using IntelliSense as a tool — not copy-pasted.
 > Small practice apps built alongside for muscle memory.
 > Every concept understood before moving to next.
-> Logic behind everything explored before implementation.
-> C# is the soul — generics is the heartbeat.
+> Root cause of every concept explored before implementation.
+> Generics is the soul — async has its own relevance.
+> C# is the foundation of everything built here.
